@@ -1,0 +1,1202 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reader Questions Portal — Prototype</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --red: #bb2f2c;
+    --red-dark: #9a2522;
+    --ink: #1d2731;
+    --ink-2: #2a3744;
+    --utility-bg: #4a443e;
+    --gold: #c79a4f;
+    --gold-2: #b88a3f;
+    --bg: #ffffff;
+    --bg-2: #f5f5f5;
+    --card: #ffffff;
+    --border: #e3e3e3;
+    --text: #1c1f24;
+    --logo-dark: #2c2c2c;
+    --muted: #6b7280;
+    --green: #1a7f4f;
+    --amber: #b86e00;
+    --slate: #4b5563;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  /* Utility bar */
+  .utility-bar {
+    background: var(--utility-bg);
+    color: #f0e9dc;
+    padding: 10px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    gap: 20px;
+  }
+  .utility-bar .left { display: flex; align-items: center; gap: 14px; min-width: 0; flex: 1; }
+  .utility-bar .breaking-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--red); color: #fff;
+    font-size: 11px; font-weight: 800; letter-spacing: 1px;
+    padding: 4px 10px; border-radius: 12px; flex-shrink: 0;
+  }
+  .utility-bar .breaking-pill::before { content: "📢"; font-size: 11px; }
+  .utility-bar .left-text { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .utility-bar .left-text a { color: var(--gold); text-decoration: none; font-weight: 600; }
+  .utility-bar .left-text a:hover { text-decoration: underline; }
+  .utility-bar .right { display: flex; align-items: center; gap: 18px; flex-shrink: 0; }
+  .utility-bar .right a {
+    color: var(--gold); text-decoration: none; font-weight: 600; font-size: 13px;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .utility-bar .right a:hover { color: #fff; }
+  .utility-bar .incider {
+    border: 1px solid var(--gold);
+    padding: 6px 14px; border-radius: 18px;
+  }
+
+  header.top {
+    background: #fff;
+    color: var(--text);
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .brand-mark { display: flex; align-items: center; line-height: 1; }
+  .brand-mark img { height: 56px; width: auto; display: block; }
+  .header-actions { display: flex; align-items: center; gap: 22px; }
+  .header-actions a {
+    color: var(--logo-dark); text-decoration: none; font-size: 14px;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .header-actions a:hover { color: var(--red); }
+  .header-actions .icon { font-size: 16px; opacity: 0.85; }
+
+  /* Prototype controls strip */
+  .proto-strip {
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .proto-strip .label { text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700; color: var(--slate); }
+  .role-switch { display: flex; gap: 6px; align-items: center; }
+  .role-switch button {
+    background: #fff;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    cursor: pointer;
+  }
+  .role-switch button:hover { border-color: var(--red); color: var(--red); }
+  .role-switch button.active { background: var(--red); color: #fff; border-color: var(--red); }
+  .subnav {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #4b5563;
+    position: relative;
+    z-index: 40;
+  }
+  .subnav .community-wrap { position: relative; padding-right: 24px; border-right: 1px solid var(--border); }
+  .subnav .community-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: none; border: 0; cursor: pointer;
+    color: var(--text); font: inherit;
+    text-transform: uppercase; letter-spacing: 1px;
+    padding: 0;
+  }
+  .subnav .community-btn::before { content: "📍"; font-size: 14px; }
+  .subnav .community-btn .caret { font-size: 10px; opacity: 0.6; margin-left: 2px; }
+  .subnav .community-btn:hover { color: var(--red); }
+  .subnav .community-current { font-weight: 800; color: var(--red); margin-left: 6px; text-transform: none; letter-spacing: 0; font-size: 12px; }
+  .subnav a { color: inherit; text-decoration: none; white-space: nowrap; }
+  .subnav a:hover { color: var(--red); }
+  .community-panel {
+    display: none;
+    position: absolute; top: calc(100% + 8px); left: -16px;
+    background: #fff; border: 1px solid var(--border); border-radius: 4px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+    width: 720px; max-width: 90vw; max-height: 70vh; overflow: auto;
+    padding: 18px 22px;
+    z-index: 50;
+    text-transform: none; letter-spacing: normal; font-weight: normal;
+  }
+  .community-panel.open { display: block; }
+  .community-panel h4 {
+    margin: 0 0 8px; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--muted);
+  }
+  .community-panel .metro { margin-bottom: 18px; }
+  .community-panel .metro:last-child { margin-bottom: 0; }
+  .community-panel ul { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 24px; }
+  .community-panel li { break-inside: avoid; margin-bottom: 4px; }
+  .community-panel li button {
+    background: none; border: 0; padding: 4px 0;
+    font: inherit; color: var(--text); cursor: pointer; text-align: left; width: 100%;
+    font-size: 13px;
+  }
+  .community-panel li button:hover { color: var(--red); }
+  .community-panel li button.active { color: var(--red); font-weight: 700; }
+  .session {
+    padding: 10px 32px;
+    background: var(--bg-2);
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .session select { font-size: 13px; padding: 3px 6px; }
+  main { max-width: 980px; margin: 0 auto; padding: 36px 32px 60px; }
+  .view { display: none; }
+  .view.active { display: block; }
+  h1 { font-size: 30px; margin: 0 0 8px; font-weight: 800; letter-spacing: -0.3px; }
+  h2 { font-size: 18px; margin: 0 0 12px; font-weight: 700; }
+  .lede { color: var(--muted); margin: 0 0 24px; font-size: 16px; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 6px; color: var(--slate); }
+  select, textarea, input[type=text] {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #fff;
+  }
+  select:focus, textarea:focus, input[type=text]:focus {
+    outline: none;
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(187,47,44,0.12);
+  }
+  textarea { resize: vertical; min-height: 120px; }
+  .field { margin-bottom: 18px; }
+  .help { font-size: 12px; color: var(--muted); margin-top: 5px; }
+  .btn {
+    background: var(--red);
+    color: #fff;
+    border: 0;
+    padding: 11px 22px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--red-dark); }
+  .btn-secondary { background: #fff; color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { background: #f5f5f5; border-color: #b0b0b0; }
+  .btn-link { background: none; border: 0; color: var(--red); cursor: pointer; padding: 0; font-size: 13px; font-weight: 600; }
+  .btn-link:hover { text-decoration: underline; }
+  .row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .badge.submitted { background: #f4e6e5; color: var(--red); }
+  .badge.reviewing { background: #fff1d6; color: var(--amber); }
+  .badge.replied { background: #d8efe1; color: var(--green); }
+  .badge.closed { background: #ececec; color: var(--slate); }
+  .badge.credit { background: #fbf3f3; color: var(--red); border: 1px solid #ecd6d5; }
+  .credit-callout {
+    background: #fbf3f3;
+    border: 1px solid #ecd6d5;
+    border-left: 3px solid var(--red);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+  .credit-callout .head {
+    font-weight: 700; color: var(--red); font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px;
+  }
+  .credit-callout .preview {
+    margin-top: 8px; padding: 8px 10px; background: #fff;
+    border: 1px dashed #ecd6d5; border-radius: 3px;
+    font-style: italic; color: var(--slate);
+  }
+  .q-list { list-style: none; padding: 0; margin: 0; }
+  .q-list li {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .q-list li:hover { border-color: var(--red); box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .q-list .q-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .q-list .q-snippet { font-weight: 600; }
+  .q-right { text-align: right; flex-shrink: 0; }
+  .empty {
+    background: #fff;
+    border: 1px dashed var(--border);
+    padding: 30px;
+    border-radius: 6px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .thread { display: flex; flex-direction: column; gap: 12px; }
+  .msg {
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 6px;
+    padding: 14px 16px;
+  }
+  .msg.editorial { background: #fbf3f3; border-color: #ecd6d5; border-left: 3px solid var(--red); }
+  .msg-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .msg-from { font-weight: 600; color: var(--text); }
+  .photo-preview {
+    margin-top: 8px;
+    max-width: 220px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    display: block;
+  }
+  .filters {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filters select { width: auto; }
+  .breadcrumb { font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .breadcrumb button { background: none; border: 0; color: var(--red); cursor: pointer; padding: 0; font-size: 13px; font-weight: 600; }
+  .status-controls { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .status-controls select { width: auto; }
+  .reader-card-info {
+    background: #f7f9fc;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 13px;
+    color: var(--slate);
+    margin-bottom: 12px;
+  }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .mermaid { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 20px; }
+  .seed-note { font-size: 12px; color: var(--muted); margin-top: 14px; text-align: center; }
+  .seed-note button { font-size: 12px; }
+  footer.site {
+    background: var(--ink);
+    color: #cbd2d9;
+    padding: 40px 32px 32px;
+    margin-top: 60px;
+    font-size: 13px;
+  }
+  footer.site .inner { max-width: 980px; margin: 0 auto; display: flex; justify-content: space-between; gap: 30px; flex-wrap: wrap; }
+  footer.site .tagline { display: flex; align-items: center; gap: 14px; }
+  footer.site .tagline .pin {
+    width: 36px; height: 44px;
+    background: #fff;
+    clip-path: path("M18 0 C8 0 0 8 0 18 C0 30 18 44 18 44 C18 44 36 30 36 18 C36 8 28 0 18 0 Z");
+    display: flex; align-items: center; justify-content: center;
+    color: var(--red); font-weight: 800; font-size: 13px; letter-spacing: 0.5px;
+    padding-top: 4px;
+  }
+  footer.site .links a { color: #cbd2d9; text-decoration: none; margin-right: 18px; }
+  footer.site .links a:hover { color: #fff; }
+  footer.site .copy { font-size: 11px; color: #8a929b; margin-top: 24px; max-width: 980px; margin-left: auto; margin-right: auto; }
+  hr.soft { border: 0; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  /* Login overlay */
+  .login-overlay {
+    position: fixed; inset: 0;
+    background: rgba(29, 39, 49, 0.85);
+    display: none;
+    align-items: center; justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+  .login-overlay.show { display: flex; }
+  .login-card {
+    background: #fff;
+    border-radius: 6px;
+    padding: 36px 36px 30px;
+    max-width: 440px; width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .login-card .logo { text-align: center; margin-bottom: 8px; }
+  .login-card .logo img { height: 50px; }
+  .login-card h2 { text-align: center; margin: 8px 0 6px; font-size: 22px; }
+  .login-card .sub { text-align: center; color: var(--muted); margin: 0 0 22px; font-size: 14px; }
+  .login-card .field { margin-bottom: 14px; }
+  .login-card .btn { width: 100%; padding: 13px; font-size: 15px; }
+  .login-card .demo-note {
+    background: #fbf3f3; border: 1px solid #ecd6d5; border-radius: 4px;
+    padding: 10px 12px; font-size: 12px; color: var(--slate);
+    margin-bottom: 18px; line-height: 1.5;
+  }
+  .login-card .demo-note strong { color: var(--red); }
+  .session-actions { display: flex; align-items: center; gap: 10px; }
+  .session-actions .signout {
+    background: none; border: 0; color: var(--red);
+    cursor: pointer; font: inherit; font-weight: 600; font-size: 13px; padding: 0;
+  }
+  .session-actions .signout:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="logo"><img src="ci-logo.png" alt="Community Impact" /></div>
+    <h2>Sign in</h2>
+    <p class="sub">Welcome to the reader questions portal</p>
+    <div class="demo-note">
+      <strong>Prototype demo:</strong> Any name and email works — no real authentication. Use your <strong>@communityimpact.com</strong> email to also see the editorial side.
+    </div>
+    <div class="field">
+      <label for="loginName">Your name</label>
+      <input type="text" id="loginName" placeholder="e.g. Taylor Swift" />
+    </div>
+    <div class="field">
+      <label for="loginEmail">Email</label>
+      <input type="text" id="loginEmail" placeholder="you@example.com" />
+    </div>
+    <button class="btn" onclick="doLogin()">Sign in</button>
+  </div>
+</div>
+
+<div class="utility-bar">
+  <div class="left">
+    <span class="breaking-pill">BREAKING</span>
+    <span class="left-text">Reader Questions Portal is now live for InCider members. <a href="#">Learn more</a></span>
+  </div>
+  <div class="right">
+    <a href="#">✉ Newsletters</a>
+    <a href="#" class="incider">★ Become an InCider</a>
+  </div>
+</div>
+
+<header class="top">
+  <div class="brand-mark">
+    <img src="ci-logo.png" alt="Community Impact" />
+  </div>
+  <div class="header-actions">
+    <a href="#"><span class="icon">🔍</span>Search</a>
+    <a href="#"><span class="icon">👤</span>Sign In</a>
+  </div>
+</header>
+
+<nav class="subnav">
+  <div class="community-wrap">
+    <button class="community-btn" id="communityBtn" type="button">
+      <span id="communityLabel">Choose your community</span>
+      <span class="community-current" id="communityCurrent"></span>
+      <span class="caret">▾</span>
+    </button>
+    <div class="community-panel" id="communityPanel"></div>
+  </div>
+  <a href="#">Business</a>
+  <a href="#">Education</a>
+  <a href="#">Government</a>
+  <a href="#">Dining</a>
+  <a href="#">Health Care</a>
+  <a href="#">Real Estate</a>
+  <a href="#">Transportation</a>
+</nav>
+
+<div class="proto-strip">
+  <span class="label">Prototype mode — view as:</span>
+  <div class="role-switch" id="roleSwitch">
+    <button data-role="reader" class="active">Reader</button>
+    <button data-role="editorial">Editorial</button>
+    <button data-role="flow">Flow diagram</button>
+  </div>
+</div>
+
+<div class="session" id="sessionBar">
+  <div id="sessionLeft"></div>
+  <div id="sessionRight"></div>
+</div>
+
+<main>
+
+  <section class="view" id="view-reader-home">
+    <h1>Ask the Newsroom</h1>
+    <div class="card">
+      <h2>How it works</h2>
+      <ol>
+        <li>Pick the market closest to your question.</li>
+        <li>Write your question — add a photo if it helps.</li>
+        <li>Your local editor reviews and responds in your portal. We may also feature your answer as a live story on our site.</li>
+      </ol>
+      <div style="margin-top: 16px;">
+        <button class="btn" onclick="go('reader-submit')">Ask a question</button>
+        <button class="btn btn-secondary" onclick="go('reader-inbox')">My questions</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-reader-submit">
+    <div class="breadcrumb"><button onclick="go('reader-home')">← Back</button></div>
+    <h1>Ask a question</h1>
+    <p class="lede">Your question goes only to the editor for the market you select. It is not posted publicly.</p>
+    <div class="card">
+      <div class="field">
+        <label for="marketSelect">Market</label>
+        <select id="marketSelect">
+          <option value="">— Select your market —</option>
+        </select>
+        <div class="help">Don't see your area? Pick the closest market — the editor can route it.</div>
+      </div>
+      <div class="field">
+        <label for="qText">Your question</label>
+        <textarea id="qText" placeholder="What would you like to know? Be as specific as you can — neighborhood, intersection, business name, etc."></textarea>
+      </div>
+      <div class="field">
+        <label for="qPhoto">Photo (optional)</label>
+        <input type="file" id="qPhoto" accept="image/*" />
+        <div class="help">Helpful for questions about a specific place, sign, building, etc.</div>
+        <img id="qPhotoPreview" class="photo-preview" style="display:none;" />
+      </div>
+      <div class="field credit-field">
+        <label style="display:flex; align-items:flex-start; gap:8px; font-weight:600; cursor:pointer;">
+          <input type="checkbox" id="qCredit" style="margin-top:3px; width:auto;" />
+          <span>If this becomes a story, you can credit me as the source.<br/>
+          <span class="help" style="margin-top:2px;">Reporter's byline stays the same. We'll add a line like <em>"Story idea submitted by [your name]."</em></span></span>
+        </label>
+        <div id="qCreditNameWrap" style="display:none; margin-top:10px;">
+          <label for="qCreditName">Name to credit</label>
+          <input type="text" id="qCreditName" placeholder="How your name should appear" />
+        </div>
+      </div>
+      <button class="btn" onclick="submitQuestion()">Submit question</button>
+    </div>
+  </section>
+
+  <section class="view" id="view-reader-confirm">
+    <h1>Question submitted</h1>
+    <div class="card">
+      <p>Thanks — your question has been sent to the <strong id="confirmMarket"></strong> editor. You'll get a notification in your portal when they reply.</p>
+      <p class="help">Most questions get a first response within 2–3 business days.</p>
+      <div class="row" style="margin-top: 14px;">
+        <button class="btn" onclick="go('reader-inbox')">View my questions</button>
+        <button class="btn btn-secondary" onclick="go('reader-submit')">Ask another</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-reader-inbox">
+    <div class="breadcrumb"><button onclick="go('reader-home')">← Back</button></div>
+    <h1>My questions</h1>
+    <p class="lede">All your questions and replies, in one place.</p>
+    <div style="margin-bottom: 14px;">
+      <button class="btn" onclick="go('reader-submit')">+ Ask a new question</button>
+    </div>
+    <ul class="q-list" id="readerInboxList"></ul>
+  </section>
+
+  <section class="view" id="view-reader-thread">
+    <div class="breadcrumb"><button onclick="go('reader-inbox')">← My questions</button></div>
+    <h1 id="readerThreadTitle">Question thread</h1>
+    <div id="readerThreadMeta" class="lede"></div>
+    <div class="thread" id="readerThreadBody"></div>
+    <div class="card" id="readerReplyBox" style="margin-top: 16px;">
+      <label for="readerReplyText">Add a follow-up</label>
+      <textarea id="readerReplyText" placeholder="Reply to your editor..."></textarea>
+      <button class="btn" style="margin-top: 10px;" onclick="readerReply()">Send follow-up</button>
+    </div>
+  </section>
+
+  <section class="view" id="view-editorial-inbox">
+    <h1>Editorial inbox</h1>
+    <p class="lede">Reader questions routed to your assigned market(s).</p>
+    <div class="filters">
+      <label style="margin: 0;">Status:</label>
+      <select id="filterStatus">
+        <option value="all">All</option>
+        <option value="new">New</option>
+        <option value="in_progress">In progress</option>
+        <option value="replied">Replied</option>
+        <option value="closed">Closed</option>
+      </select>
+      <label style="margin: 0;">Sort:</label>
+      <select id="filterSort">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+      </select>
+    </div>
+    <ul class="q-list" id="editorialInboxList"></ul>
+  </section>
+
+  <section class="view" id="view-editorial-thread">
+    <div class="breadcrumb"><button onclick="go('editorial-inbox')">← Inbox</button></div>
+    <h1 id="editorialThreadTitle">Question</h1>
+    <div id="editorialThreadMeta" class="lede"></div>
+    <div class="reader-card-info" id="editorialReaderInfo"></div>
+    <div class="credit-callout" id="editorialCreditCallout" style="display:none;"></div>
+    <div class="thread" id="editorialThreadBody"></div>
+    <div class="card" style="margin-top: 16px;">
+      <label for="editorialReplyText">Reply to reader</label>
+      <textarea id="editorialReplyText" placeholder="Type your response..."></textarea>
+      <div class="status-controls">
+        <button class="btn" onclick="editorialReply()">Send reply</button>
+        <label style="margin: 0;">Set status:</label>
+        <select id="editorialStatus">
+          <option value="new">New</option>
+          <option value="in_progress">In progress</option>
+          <option value="replied">Replied</option>
+          <option value="closed">Closed</option>
+        </select>
+        <button class="btn btn-secondary" onclick="editorialUpdateStatus()">Update status</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-flow">
+    <h1>End-to-end flow</h1>
+    <p class="lede">Reader submission through editorial response, including the back-and-forth thread.</p>
+    <div class="mermaid">
+flowchart TD
+  A([Reader visits CI site]) --> B{Logged in?}
+  B -- No --> B1[Login / signup<br/>same auth as race-data] --> C
+  B -- Yes --> C[Reader opens<br/>Ask the Newsroom]
+  C --> D[Selects market<br/>writes question<br/>optional photo]
+  D --> D2{Opt in to<br/>story-idea credit?}
+  D2 -- Yes --> D3[Reader confirms<br/>credit name]
+  D2 -- No --> E
+  D3 --> E[Submit]
+  E --> F[(Question stored<br/>status: New<br/>credit pref attached)]
+  F --> G[Routed to market editor's inbox<br/>Credit OK badge if opted in]
+  G --> H[Editor reviews]
+  H --> I{Needs research?}
+  I -- Yes --> I1[Status: In progress] --> J
+  I -- No --> J[Editor writes reply<br/>status: Replied]
+  J --> K[Reader notified in portal]
+  K --> L{Reader has follow-up?}
+  L -- Yes --> M[Reader sends follow-up<br/>back to editor inbox] --> H
+  L -- No --> N[Editor closes thread<br/>status: Closed]
+  J --> P{Becomes a<br/>published story?}
+  P -- Yes & credit opted in --> P1[Reporter writes story<br/>byline = reporter<br/>add line: 'Story idea<br/>submitted by Name']
+  P -- Yes & no credit --> P2[Reporter writes story<br/>no reader credit]
+  P -- No --> N
+
+  classDef reader fill:#fbf3f3,stroke:#bb2f2c,color:#bb2f2c;
+  classDef editor fill:#1d2731,stroke:#1d2731,color:#ffffff;
+  classDef store fill:#ececec,stroke:#6b7280,color:#1c1f24;
+  classDef story fill:#fff1d6,stroke:#b86e00,color:#7a4a00;
+  class A,B,B1,C,D,D2,D3,E,K,L,M reader;
+  class G,H,I,I1,J,N editor;
+  class F store;
+  class P,P1,P2 story;
+    </div>
+    <p class="seed-note">
+      <button class="btn-link" onclick="resetData()">Reset prototype data</button>
+      &nbsp;·&nbsp;
+      <span>State is saved in your browser (localStorage) — refresh-safe.</span>
+    </p>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="inner">
+    <div class="tagline">
+      <div class="pin">CI</div>
+      <div>Hyperlocal news for Texas<br/>communities since 2005.</div>
+    </div>
+    <div class="links">
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+      <a href="#">Careers</a>
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+    </div>
+  </div>
+  <div class="copy">© 2026 Community Impact Newspaper. Prototype — not a live page.</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MARKETS = {
+  "Austin": [
+    "Bastrop | Cedar Creek","Cedar Park","Central Austin","East Austin","Georgetown",
+    "Lake Travis | Westlake","Leander | Liberty Hill","New Braunfels","Northwest Austin",
+    "Pflugerville | Hutto","Round Rock","San Marcos | Buda | Kyle","Southwest Austin | Dripping Springs"
+  ],
+  "Houston": [
+    "Bay Area","Bellaire | Meyerland | West University","Conroe | Montgomery",
+    "Cy-Fair | Jersey Village","Cypress","Heights | River Oaks | Montrose",
+    "Katy | Fulshear","Lake Houston | Humble | Kingwood","New Caney | Porter",
+    "Pearland | Friendswood | Manvel","Spring | Klein","Sugar Land | Missouri City",
+    "The Woodlands","Tomball | Magnolia"
+  ],
+  "Dallas / Fort Worth": [
+    "Allen","Denton","Flower Mound | Highland Village | Argyle","Frisco",
+    "Grapevine | Colleyville | Southlake","Keller | Roanoke | Northeast Fort Worth",
+    "McKinney","Plano","Prosper | Celina","Richardson"
+  ],
+  "Bryan / College Station": ["Bryan | College Station"]
+};
+const ALL_MARKETS = Object.values(MARKETS).flat();
+
+const STORE_KEY = "ci_reader_questions_proto_v1";
+let state = loadState();
+
+function loadState() {
+  try { const raw = localStorage.getItem(STORE_KEY); if (raw) return JSON.parse(raw); } catch (e) {}
+  return seedState();
+}
+function saveState() { localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+
+function seedState() {
+  const now = Date.now();
+  const h = n => now - 1000 * 60 * 60 * n;
+  const d = n => now - 1000 * 60 * 60 * 24 * n;
+  return {
+    role: "reader",
+    signedIn: false,
+    isStaff: false,
+    reader: { name: "", email: "" },
+    editor: { name: "Editorial", market: "Cedar Park" },
+    selectedCommunity: null,
+    questions: [
+      // Cedar Park — varied statuses, includes credit
+      { id: "q1", readerName: "Andrea Lopez", readerEmail: "alopez@example.com",
+        market: "Cedar Park", status: "replied", createdAt: d(2), photo: null,
+        credit: { allow: false, name: null },
+        messages: [
+          { from: "reader", author: "Andrea Lopez", at: d(2),
+            text: "When is the new HEB on Whitestone Blvd expected to open? I've seen construction signs but no opening date." },
+          { from: "editorial", author: "Cedar Park editor", at: d(1),
+            text: "Hi Andrea — thanks for the question. The HEB on Whitestone is currently slated for a fall opening. I'm working on a story with the latest details and will share it once it runs." }
+        ] },
+      { id: "q2", readerName: "Jordan Pemberton", readerEmail: "jordan.p@example.com",
+        market: "Cedar Park", status: "new", createdAt: h(6), photo: null,
+        credit: { allow: true, name: "Jordan Pemberton" },
+        messages: [{ from: "reader", author: "Jordan Pemberton", at: h(6),
+          text: "Is the city planning to add a sidewalk along Brushy Creek Rd between Parmer and Sam Bass? It's a really dangerous walk right now — kids cross there for school." }] },
+      { id: "q3", readerName: "Pat Singh", readerEmail: "pat.s@example.com",
+        market: "Cedar Park", status: "in_progress", createdAt: h(30), photo: null,
+        credit: { allow: false, name: null },
+        messages: [{ from: "reader", author: "Pat Singh", at: h(30),
+          text: "What's going in at the old Bed Bath & Beyond on 1431? Sign came down last week." }] },
+
+      // Frisco
+      { id: "q4", readerName: "Megan Tran", readerEmail: "mtran@example.com",
+        market: "Frisco", status: "new", createdAt: h(3), photo: null,
+        credit: { allow: true, name: "Megan Tran" },
+        messages: [{ from: "reader", author: "Megan Tran", at: h(3),
+          text: "Frisco ISD just announced a bond — when's the vote and what specifically is included? I can't find a clear summary." }] },
+      { id: "q5", readerName: "Daniel Reyes", readerEmail: "dreyes@example.com",
+        market: "Frisco", status: "replied", createdAt: d(3), photo: null,
+        credit: { allow: false, name: null },
+        messages: [
+          { from: "reader", author: "Daniel Reyes", at: d(3),
+            text: "Any update on the Universal Kids Resort timeline?" },
+          { from: "editorial", author: "Frisco editor", at: d(2),
+            text: "Hi Daniel — Universal confirmed a 2026 opening at last month's council meeting. We have an explainer here on our site with the latest renderings. Let me know if you have follow-up questions." }
+        ] },
+
+      // The Woodlands
+      { id: "q6", readerName: "Rachel Bauer", readerEmail: "rbauer@example.com",
+        market: "The Woodlands", status: "in_progress", createdAt: d(1), photo: null,
+        credit: { allow: true, name: "Rachel Bauer" },
+        messages: [{ from: "reader", author: "Rachel Bauer", at: d(1),
+          text: "Why are property tax bills going up so much this year in Montgomery County? Mine jumped 18%." }] },
+
+      // Round Rock
+      { id: "q7", readerName: "Chris Okafor", readerEmail: "cokafor@example.com",
+        market: "Round Rock", status: "new", createdAt: h(12), photo: null,
+        credit: { allow: false, name: null },
+        messages: [{ from: "reader", author: "Chris Okafor", at: h(12),
+          text: "Are there any new restaurants opening at La Frontera? Heard rumors about a Korean BBQ place." }] },
+
+      // Plano
+      { id: "q8", readerName: "Susan Whitfield", readerEmail: "swhitfield@example.com",
+        market: "Plano", status: "closed", createdAt: d(8), photo: null,
+        credit: { allow: false, name: null },
+        messages: [
+          { from: "reader", author: "Susan Whitfield", at: d(8),
+            text: "When does construction on the Legacy West expansion start?" },
+          { from: "editorial", author: "Plano editor", at: d(7),
+            text: "Hi Susan — groundbreaking happened last month. Story is live on our site." },
+          { from: "reader", author: "Susan Whitfield", at: d(7),
+            text: "Thanks!" }
+        ] },
+
+      // Bryan | College Station
+      { id: "q9", readerName: "Tom Becker", readerEmail: "tbecker@example.com",
+        market: "Bryan | College Station", status: "new", createdAt: h(20), photo: null,
+        credit: { allow: true, name: "Tom Becker" },
+        messages: [{ from: "reader", author: "Tom Becker", at: h(20),
+          text: "Is A&M still planning to expand the RELLIS campus? Saw stakes in the ground last weekend." }] },
+
+      // Katy | Fulshear
+      { id: "q10", readerName: "Lisa Park", readerEmail: "lpark@example.com",
+        market: "Katy | Fulshear", status: "in_progress", createdAt: d(2), photo: null,
+        credit: { allow: false, name: null },
+        messages: [{ from: "reader", author: "Lisa Park", at: d(2),
+          text: "When will the Westpark Tollway extension actually open? It's been 'coming soon' for two years." }] }
+    ]
+  };
+}
+
+function resetData() {
+  if (!confirm("Reset prototype to seed data?")) return;
+  localStorage.removeItem(STORE_KEY);
+  state = seedState(); saveState(); render(); toast("Prototype reset");
+}
+
+let currentView = "reader-home";
+let currentThreadId = null;
+
+function go(view, threadId) {
+  currentView = view;
+  if (threadId) currentThreadId = threadId;
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+  const el = document.getElementById("view-" + view);
+  if (el) el.classList.add("active");
+  if (view === "reader-inbox") renderReaderInbox();
+  if (view === "reader-thread") renderReaderThread();
+  if (view === "editorial-inbox") renderEditorialInbox();
+  if (view === "editorial-thread") renderEditorialThread();
+  window.scrollTo(0, 0);
+}
+
+function setRole(role) {
+  state.role = role; saveState();
+  document.querySelectorAll("#roleSwitch button").forEach(b => {
+    b.classList.toggle("active", b.dataset.role === role);
+  });
+  if (role === "reader") go("reader-home");
+  else if (role === "editorial") go("editorial-inbox");
+  else if (role === "flow") go("flow");
+  renderSessionBar();
+}
+
+document.getElementById("roleSwitch").addEventListener("click", (e) => {
+  if (e.target.tagName === "BUTTON") setRole(e.target.dataset.role);
+});
+
+function renderSessionBar() {
+  const left = document.getElementById("sessionLeft");
+  const right = document.getElementById("sessionRight");
+  const signOut = `<button class="signout" onclick="doLogout()">Sign out</button>`;
+  if (state.role === "reader") {
+    left.innerHTML = `Signed in as <strong>${escapeHtml(state.reader.name)}</strong> (${escapeHtml(state.reader.email)})`;
+    right.innerHTML = `<div class="session-actions">${signOut}</div>`;
+  } else if (state.role === "editorial") {
+    const opts = ALL_MARKETS.map(m =>
+      `<option value="${escapeAttr(m)}" ${m === state.editor.market ? "selected" : ""}>${escapeHtml(m)}</option>`
+    ).join("");
+    left.innerHTML = `Signed in as <strong>${escapeHtml(state.reader.name)}</strong> · Editor for:`;
+    right.innerHTML = `<div class="session-actions"><select id="editorMarketSelect">${opts}</select> ${signOut}</div>`;
+    document.getElementById("editorMarketSelect").addEventListener("change", (e) => {
+      state.editor.market = e.target.value; saveState();
+      if (currentView === "editorial-inbox") renderEditorialInbox();
+      else go("editorial-inbox");
+    });
+  } else {
+    left.innerHTML = `<em>Diagram view — flow logic across both roles</em>`;
+    right.innerHTML = `<div class="session-actions">${signOut}</div>`;
+  }
+}
+
+/* Mock login */
+function isStaffEmail(email) { return /@communityimpact\.com$/i.test((email || "").trim()); }
+
+function doLogin() {
+  const name = document.getElementById("loginName").value.trim();
+  const email = document.getElementById("loginEmail").value.trim();
+  if (!name) { toast("Please enter your name"); return; }
+  if (!email || !email.includes("@")) { toast("Please enter a valid email"); return; }
+  state.reader = { name, email };
+  state.isStaff = isStaffEmail(email);
+  state.signedIn = true;
+  state.role = "reader";
+  saveState();
+  document.getElementById("loginOverlay").classList.remove("show");
+  refreshAllUi();
+  toast(state.isStaff ? "Signed in — staff access" : "Signed in");
+}
+
+function doLogout() {
+  state.signedIn = false;
+  state.role = "reader";
+  saveState();
+  document.getElementById("loginOverlay").classList.add("show");
+  document.getElementById("loginName").value = "";
+  document.getElementById("loginEmail").value = "";
+}
+
+function refreshAllUi() {
+  // Show / hide proto-strip based on staff flag
+  const strip = document.querySelector(".proto-strip");
+  if (strip) strip.style.display = state.isStaff ? "flex" : "none";
+  setRole(state.role || "reader");
+}
+
+function gateLogin() {
+  if (!state.signedIn) {
+    document.getElementById("loginOverlay").classList.add("show");
+  }
+}
+
+function populateMarketSelect() {
+  const sel = document.getElementById("marketSelect");
+  let html = '<option value="">— Select your market —</option>';
+  for (const metro of Object.keys(MARKETS)) {
+    html += `<optgroup label="${escapeAttr(metro)}">`;
+    for (const m of MARKETS[metro]) html += `<option value="${escapeAttr(m)}">${escapeHtml(m)}</option>`;
+    html += "</optgroup>";
+  }
+  sel.innerHTML = html;
+}
+
+let pendingPhoto = null;
+document.getElementById("qPhoto").addEventListener("change", (e) => {
+  const f = e.target.files[0];
+  const preview = document.getElementById("qPhotoPreview");
+  if (!f) { pendingPhoto = null; preview.style.display = "none"; return; }
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    pendingPhoto = ev.target.result;
+    preview.src = pendingPhoto; preview.style.display = "block";
+  };
+  reader.readAsDataURL(f);
+});
+
+document.getElementById("qCredit").addEventListener("change", (e) => {
+  const wrap = document.getElementById("qCreditNameWrap");
+  const nameInput = document.getElementById("qCreditName");
+  wrap.style.display = e.target.checked ? "block" : "none";
+  if (e.target.checked && !nameInput.value) nameInput.value = state.reader.name;
+});
+
+function submitQuestion() {
+  const market = document.getElementById("marketSelect").value;
+  const text = document.getElementById("qText").value.trim();
+  const creditOk = document.getElementById("qCredit").checked;
+  const creditName = document.getElementById("qCreditName").value.trim();
+  if (!market) { toast("Please select a market"); return; }
+  if (!text) { toast("Please write your question"); return; }
+  const q = {
+    id: "q" + Date.now(),
+    readerName: state.reader.name, readerEmail: state.reader.email,
+    market: market, status: "new", createdAt: Date.now(), photo: pendingPhoto,
+    credit: { allow: creditOk, name: creditOk ? (creditName || state.reader.name) : null },
+    messages: [{ from: "reader", author: state.reader.name, at: Date.now(), text }]
+  };
+  state.questions.unshift(q); saveState();
+  document.getElementById("confirmMarket").textContent = market;
+  document.getElementById("marketSelect").value = "";
+  document.getElementById("qText").value = "";
+  document.getElementById("qPhoto").value = "";
+  document.getElementById("qPhotoPreview").style.display = "none";
+  document.getElementById("qCredit").checked = false;
+  document.getElementById("qCreditName").value = "";
+  document.getElementById("qCreditNameWrap").style.display = "none";
+  pendingPhoto = null;
+  go("reader-confirm");
+}
+
+function renderReaderInbox() {
+  const list = document.getElementById("readerInboxList");
+  const mine = state.questions.filter(q => q.readerEmail === state.reader.email);
+  if (!mine.length) { list.innerHTML = `<div class="empty">You haven't asked any questions yet.</div>`; return; }
+  list.innerHTML = mine.map(q => {
+    const last = q.messages[q.messages.length - 1];
+    const snippet = q.messages[0].text;
+    return `<li onclick="go('reader-thread','${q.id}')">
+      <div>
+        <div class="q-snippet">${escapeHtml(truncate(snippet, 90))}</div>
+        <div class="q-meta">${escapeHtml(q.market)} · last update ${timeAgo(last.at)}</div>
+      </div>
+      <div class="q-right">${readerStatusBadge(q.status)}</div>
+    </li>`;
+  }).join("");
+}
+
+function renderReaderThread() {
+  const q = state.questions.find(x => x.id === currentThreadId);
+  if (!q) { go("reader-inbox"); return; }
+  document.getElementById("readerThreadTitle").textContent = "Question to " + q.market + " editor";
+  let metaHtml = `${readerStatusBadge(q.status)} &nbsp; Submitted ${timeAgo(q.createdAt)}`;
+  if (q.credit && q.credit.allow) {
+    metaHtml += ` &nbsp; · &nbsp; <span class="badge credit">Credit OK as ${escapeHtml(q.credit.name)}</span>`;
+  }
+  document.getElementById("readerThreadMeta").innerHTML = metaHtml;
+  document.getElementById("readerThreadBody").innerHTML = renderMessages(q);
+  document.getElementById("readerReplyBox").style.display = q.status === "closed" ? "none" : "block";
+}
+
+function readerReply() {
+  const q = state.questions.find(x => x.id === currentThreadId);
+  if (!q) return;
+  const text = document.getElementById("readerReplyText").value.trim();
+  if (!text) { toast("Type a follow-up first"); return; }
+  q.messages.push({ from: "reader", author: state.reader.name, at: Date.now(), text });
+  q.status = "in_progress"; saveState();
+  document.getElementById("readerReplyText").value = "";
+  renderReaderThread(); toast("Follow-up sent");
+}
+
+function renderEditorialInbox() {
+  const list = document.getElementById("editorialInboxList");
+  const market = state.editor.market;
+  const status = document.getElementById("filterStatus").value;
+  const sort = document.getElementById("filterSort").value;
+  let items = state.questions.filter(q => q.market === market);
+  if (status !== "all") items = items.filter(q => q.status === status);
+  items.sort((a, b) => sort === "newest" ? b.createdAt - a.createdAt : a.createdAt - b.createdAt);
+  if (!items.length) {
+    list.innerHTML = `<div class="empty">No questions match the current filters for <strong>${escapeHtml(market)}</strong>.</div>`;
+    return;
+  }
+  list.innerHTML = items.map(q => {
+    const last = q.messages[q.messages.length - 1];
+    const snippet = q.messages[0].text;
+    const creditBadge = q.credit && q.credit.allow ? ' <span class="badge credit">Credit OK</span>' : '';
+    return `<li onclick="go('editorial-thread','${q.id}')">
+      <div>
+        <div class="q-snippet">${escapeHtml(truncate(snippet, 100))}</div>
+        <div class="q-meta">From ${escapeHtml(q.readerName)} · ${escapeHtml(q.market)} · last update ${timeAgo(last.at)}${q.photo ? " · 📎 photo" : ""}</div>
+      </div>
+      <div class="q-right">${editorStatusBadge(q.status)}${creditBadge}</div>
+    </li>`;
+  }).join("");
+}
+
+document.getElementById("filterStatus").addEventListener("change", renderEditorialInbox);
+document.getElementById("filterSort").addEventListener("change", renderEditorialInbox);
+
+function renderEditorialThread() {
+  const q = state.questions.find(x => x.id === currentThreadId);
+  if (!q) { go("editorial-inbox"); return; }
+  document.getElementById("editorialThreadTitle").textContent = "Question — " + q.market;
+  document.getElementById("editorialThreadMeta").innerHTML =
+    `${editorStatusBadge(q.status)} &nbsp; Received ${timeAgo(q.createdAt)}`;
+  document.getElementById("editorialReaderInfo").innerHTML =
+    `<strong>${escapeHtml(q.readerName)}</strong> &lt;${escapeHtml(q.readerEmail)}&gt;`;
+  const creditEl = document.getElementById("editorialCreditCallout");
+  if (q.credit && q.credit.allow) {
+    creditEl.style.display = "block";
+    creditEl.innerHTML = `
+      <div class="head">✔ Reader opted in to story-idea credit</div>
+      <div>If this question becomes a published story, the reader has agreed to be credited as the source. Reporter byline is unaffected.</div>
+      <div class="preview">Story idea submitted by ${escapeHtml(q.credit.name)}.</div>`;
+  } else {
+    creditEl.style.display = "none";
+  }
+  document.getElementById("editorialThreadBody").innerHTML = renderMessages(q);
+  document.getElementById("editorialStatus").value = q.status;
+}
+
+function editorialReply() {
+  const q = state.questions.find(x => x.id === currentThreadId);
+  if (!q) return;
+  const text = document.getElementById("editorialReplyText").value.trim();
+  if (!text) { toast("Type a reply first"); return; }
+  q.messages.push({ from: "editorial", author: `${state.editor.name} (${q.market} editor)`, at: Date.now(), text });
+  q.status = "replied"; saveState();
+  document.getElementById("editorialReplyText").value = "";
+  renderEditorialThread(); toast("Reply sent to reader");
+}
+
+function editorialUpdateStatus() {
+  const q = state.questions.find(x => x.id === currentThreadId);
+  if (!q) return;
+  q.status = document.getElementById("editorialStatus").value;
+  saveState(); renderEditorialThread(); toast("Status updated");
+}
+
+function renderMessages(q) {
+  return `<div>${q.messages.map(m => `
+    <div class="msg ${m.from === "editorial" ? "editorial" : ""}">
+      <div class="msg-head">
+        <span class="msg-from">${escapeHtml(m.author)}</span>
+        <span>${timeAgo(m.at)}</span>
+      </div>
+      <div>${escapeHtml(m.text).replace(/\n/g, "<br/>")}</div>
+    </div>`).join("")}
+    ${q.photo ? `<div class="msg"><div class="msg-head"><span class="msg-from">📎 Attached photo</span></div><img class="photo-preview" src="${q.photo}" /></div>` : ""}
+  </div>`;
+}
+
+function readerStatusBadge(status) {
+  const map = { new: ['submitted', 'Submitted'], in_progress: ['reviewing', 'Editorial reviewing'],
+    replied: ['replied', 'Replied'], closed: ['closed', 'Closed'] };
+  const [cls, label] = map[status] || ['submitted', status];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+function editorStatusBadge(status) {
+  const map = { new: ['submitted', 'New'], in_progress: ['reviewing', 'In progress'],
+    replied: ['replied', 'Replied'], closed: ['closed', 'Closed'] };
+  const [cls, label] = map[status] || ['submitted', status];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function escapeAttr(s) { return escapeHtml(s); }
+function truncate(s, n) { return s.length > n ? s.slice(0, n - 1) + "…" : s; }
+function timeAgo(ts) {
+  const diff = (Date.now() - ts) / 1000;
+  if (diff < 60) return "just now";
+  if (diff < 3600) return Math.floor(diff / 60) + "m ago";
+  if (diff < 86400) return Math.floor(diff / 3600) + "h ago";
+  return Math.floor(diff / 86400) + "d ago";
+}
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), 2000);
+}
+
+/* Community dropdown */
+function buildCommunityPanel() {
+  const panel = document.getElementById("communityPanel");
+  let html = "";
+  for (const metro of Object.keys(MARKETS)) {
+    html += `<div class="metro"><h4>${escapeHtml(metro)}</h4><ul>`;
+    for (const m of MARKETS[metro]) {
+      const active = state.selectedCommunity === m ? "active" : "";
+      html += `<li><button class="${active}" data-market="${escapeAttr(m)}">${escapeHtml(m)}</button></li>`;
+    }
+    html += "</ul></div>";
+  }
+  panel.innerHTML = html;
+  panel.querySelectorAll("button[data-market]").forEach(b => {
+    b.addEventListener("click", () => {
+      state.selectedCommunity = b.dataset.market;
+      saveState();
+      updateCommunityLabel();
+      buildCommunityPanel();
+      closeCommunityPanel();
+      toast("Community set: " + b.dataset.market);
+    });
+  });
+}
+function updateCommunityLabel() {
+  const label = document.getElementById("communityLabel");
+  const current = document.getElementById("communityCurrent");
+  if (state.selectedCommunity) {
+    label.textContent = "Community:";
+    current.textContent = state.selectedCommunity;
+  } else {
+    label.textContent = "Choose your community";
+    current.textContent = "";
+  }
+}
+function openCommunityPanel() { document.getElementById("communityPanel").classList.add("open"); }
+function closeCommunityPanel() { document.getElementById("communityPanel").classList.remove("open"); }
+document.getElementById("communityBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  const panel = document.getElementById("communityPanel");
+  panel.classList.contains("open") ? closeCommunityPanel() : openCommunityPanel();
+});
+document.addEventListener("click", (e) => {
+  const wrap = document.querySelector(".community-wrap");
+  if (wrap && !wrap.contains(e.target)) closeCommunityPanel();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeCommunityPanel(); });
+
+function render() {
+  populateMarketSelect();
+  renderSessionBar();
+  setRole(state.role || "reader");
+  buildCommunityPanel();
+  updateCommunityLabel();
+  refreshAllUi();
+  gateLogin();
+}
+render();
+
+function initMermaid() {
+  if (window.mermaid) {
+    try {
+      mermaid.initialize({ startOnLoad: false, theme: "default", securityLevel: "loose" });
+      mermaid.run({ querySelector: ".mermaid" });
+    } catch (e) {
+      console.error("Mermaid render failed:", e);
+      const el = document.querySelector(".mermaid");
+      if (el) el.innerHTML = '<div style="color:#bb2f2c;">Diagram could not load. (' + e.message + ')</div>';
+    }
+  } else {
+    // CDN not loaded yet — retry shortly
+    setTimeout(initMermaid, 200);
+  }
+}
+initMermaid();
+</script>
+
+</body>
+</html>
